@@ -2,19 +2,32 @@
 
 import rospy
 import rosnode
-import geometry_msgs
-#from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist
 
-def didReceiveTwist(twist):
-    forward = twist.twist.linear.z
-    turn = twist.twist.angular.y
-    rospy.loginfo(rospy.get_caller_id() + "forward %f, turning %f" % (forward, turn))
+import RPi.GPIO as GPIO
 
-def main():
-    rospy.init_node("phoebe", anonymous=True)
-    rospy.Subscriber("cmd_vel", geometry_msgs.msg.Twist, didReceiveTwist)
+DUTY_CYCLE_HZ = 500
 
-    rospy.spin()
+class Phoebe:
+    def __init__(self):
+        self.steering = GPIO.PWM(12, DUTY_CYCLE_HZ) # example pin output
+        self.motor = GPIO.PWM(13, DUTY_CYCLE_HZ) # example pin output
+
+        self.steering.start(50)
+        self.motor.start(50)
+
+        rospy.init_node("phoebe", anonymous=True)
+        rospy.Subscriber("cmd_vel", Twist, self.didReceiveTwist)
+
+        rospy.spin()
+
+    def didReceiveTwist(self, twist):
+        turn_normalized = (twist.twist.angular.y + 1) / 2.0
+        forward_normalized = (twist.twist.linear.z + 1) / 2.0
+
+        self.steering.ChangeDutyCycle(turn_normalized * 100)
+        self.motor.ChangeDutyCycle(forward_normalized * 100)
 
 if __name__ == '__main__':
-    main()
+    p = Phoebe()
+    GPIO.cleanup()
