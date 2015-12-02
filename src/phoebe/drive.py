@@ -1,11 +1,9 @@
-import RPi.GPIO as GPIO
-
 DUTY_CYCLE_HZ = 500
 
 class Drive:
-    def __init__(self):
-        self.steering = GPIO.PWM(12, DUTY_CYCLE_HZ) # example pin output
-        self.motor = GPIO.PWM(13, DUTY_CYCLE_HZ) # example pin output
+    def __init__(self, gpio):
+        self.steering = gpio.PWM(12, DUTY_CYCLE_HZ) # example pin output
+        self.motor = gpio.PWM(13, DUTY_CYCLE_HZ) # example pin output
 
         self.steering.start(50)
         self.motor.start(50)
