@@ -1,15 +1,11 @@
 import unittest
-import mock
+import doubles
 
-@patch("RPi.GPIO.PWM", autospec=True)
-class TestDrive(unittest.TestClass): # vroom, vroom
-    def setup(self, mock):
-        self.steer_mock = MagicMock()
-        self.drive_mock = MagicMock()
+def gpioDouble():
 
-        mock.side_effect = [self.steer_mock, self.drive_mock]
-
+class TestDrive(double.unittest.TestClass): # vroom, vroom
     def test_init(self, mock):
+        
         drive = Drive()
         mock.assert_has_calls([call(12, 500), call(13, 500)])
 
